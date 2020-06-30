@@ -9,6 +9,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -20,7 +21,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -92,8 +92,14 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
 
             }
         });
-        cur_pos=cur_posManger.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
+        cur_pos=cur_posManger.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        System.out.println(cur_pos);
+        // Add a marker in Sydney and move the camera
+        LatLng sydney = new LatLng(cur_pos.getLatitude(), cur_pos.getLongitude());
+
+        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney,16));
         db.collection("parkingLot")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -102,8 +108,9 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 HashMap a = (HashMap) document.getData();
-                                System.out.println(a.get("x"));
-                                LatLng b = new LatLng((double)a.get("x"),(double)a.get("y"));
+                                Object x = a.get("x");
+                                Object y = a.get("y");
+                                LatLng b = new LatLng(Double.parseDouble(x.toString()),Double.parseDouble(y.toString()));
                                 mMap.addMarker(new MarkerOptions().position(b).title("djdj"));
                             }
                         } else {
@@ -112,11 +119,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
                     }
                 });
 
-
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(cur_pos.getLatitude(), cur_pos.getLongitude());
-
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney,16));
+        Intent next = new Intent(getApplicationContext(), Payment.class);
+        startActivity(next);
     }
 }
