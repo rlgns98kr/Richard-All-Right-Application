@@ -19,9 +19,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class kakaopay extends AppCompatActivity {
+public class Kakaopay extends AppCompatActivity {
 
-    ActionBar ab;
+
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -29,11 +29,14 @@ public class kakaopay extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_kakaopay);
 
+        ActionBar ab;
+        ab = getSupportActionBar();
+        ab.hide();
+
         WebView wV = findViewById(R.id.webview);
         Intent before = getIntent();
         String url = before.getStringExtra("url");
-        ab = getSupportActionBar();
-        ab.hide();
+
 
         wV.setWebViewClient(new BWebviewClient());
         wV.getSettings().setJavaScriptEnabled(true);

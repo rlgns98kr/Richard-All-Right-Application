@@ -11,10 +11,16 @@ import android.content.Context;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.icu.text.Transliterator;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -22,6 +28,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -32,7 +39,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.HashMap;
 
 
-public class Map extends AppCompatActivity implements OnMapReadyCallback {
+public class Map extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private static final int RC_SIGN_IN = 123;
     String[] REQUIRED_PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
@@ -40,7 +47,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
     LocationManager cur_posManger;
     Location cur_pos;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-
+    LatLng sydney;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +68,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
         } else {
             update_location();
         }
+        mMap.setOnMarkerClickListener(this);
     }
 
     @Override
@@ -70,33 +78,36 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
 
     @SuppressLint("MissingPermission")
     public void update_location() {
-        cur_posManger = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-        cur_posManger.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            sydney = new LatLng(37.5015492,127.0353802);
+        }else{
+            cur_posManger = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+            cur_posManger.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
 
-            }
+                }
 
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
+                @Override
+                public void onStatusChanged(String provider, int status, Bundle extras) {
 
-            }
+                }
 
-            @Override
-            public void onProviderEnabled(String provider) {
+                @Override
+                public void onProviderEnabled(String provider) {
 
-            }
+                }
 
-            @Override
-            public void onProviderDisabled(String provider) {
+                @Override
+                public void onProviderDisabled(String provider) {
 
-            }
-        });
-
-        cur_pos=cur_posManger.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        System.out.println(cur_pos);
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(cur_pos.getLatitude(), cur_pos.getLongitude());
+                }
+            });
+            cur_pos=cur_posManger.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            System.out.println(cur_pos);
+            // Add a marker in Sydney and move the camera
+            sydney = new LatLng(cur_pos.getLatitude(), cur_pos.getLongitude());
+        }
 
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney,16));
@@ -118,8 +129,20 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback {
                         }
                     }
                 });
+    }
 
-        Intent next = new Intent(getApplicationContext(), Payment.class);
-        startActivity(next);
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        System.out.println(marker.getTitle());
+        ImageView realimage = findViewById(R.id.realimage);
+        TextView realname = findViewById(R.id.realname);
+        TextView realprice =findViewById(R.id.realprice);
+        TextView realtime = findViewById(R.id.realtime);
+
+        FrameLayout fl = findViewById(R.id.fl);
+        fl.bringToFront();
+
+
+        return false;
     }
 }

@@ -3,14 +3,10 @@ package com.gihoon.richardallright;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.Button;
 
 import com.google.gson.JsonObject;
@@ -73,7 +69,7 @@ public class Payment extends AppCompatActivity {
             JsonObject jsonObj = new JsonParser().parse(s).getAsJsonObject();
             //doInBackground()로 부터 리턴된 값이 onPostExecute()의 매개변수로 넘어오므로 s를 출력한다.
             String redirectUrl = jsonObj.get("next_redirect_app_url").getAsString();
-            Intent intent = new Intent(getApplicationContext(), kakaopay.class);
+            Intent intent = new Intent(getApplicationContext(), Kakaopay.class);
             intent.putExtra("url", redirectUrl);
             startActivity(intent);
         }

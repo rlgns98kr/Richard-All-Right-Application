@@ -2,9 +2,16 @@ package com.gihoon.richardallright;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -24,27 +31,51 @@ public class Auth extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
-        createSignInIntent();
+
+        ActionBar ab;
+        ab = getSupportActionBar();
+        ab.hide();
+
+        TextView button = (TextView) findViewById(R.id.blinking_animation);
+        Animation startAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.blink_animation);
+        button.startAnimation(startAnimation);
+
+        button.setOnClickListener(new TextView.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+                if(currentUser == null) {
+                    createSignInIntent();
+                }else{
+                    System.out.println(currentUser.getUid());
+                    Intent next = new Intent(getApplication(),Map.class);
+                    startActivity(next);
+                    finish();
+                }
+            }
+        });
     }
 
     public void createSignInIntent() {
         // [START auth_fui_create_intent]
         // Choose authentication providers
         List<AuthUI.IdpConfig> providers = Arrays.asList(
-                new AuthUI.IdpConfig.EmailBuilder().build(),
                 new AuthUI.IdpConfig.PhoneBuilder().build(),
+                new AuthUI.IdpConfig.EmailBuilder().build(),
                 new AuthUI.IdpConfig.GoogleBuilder().build(),
                 new AuthUI.IdpConfig.FacebookBuilder().build());
-        //new AuthUI.IdpConfig.TwitterBuilder().build())
 
+        Intent a = AuthUI.getInstance().createSignInIntentBuilder()
+                .setAvailableProviders(providers)
+                .setLogo(R.drawable.d)
+                .setTheme(AuthUI.getDefaultTheme())
+                .setIsSmartLockEnabled(true)
+                .build();
+        //addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        //addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         // Create and launch sign-in intent
-        startActivityForResult(
-                AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        //.setLogo()
-                        .setAvailableProviders(providers)
-                        .build(),
-                RC_SIGN_IN);
+        startActivityForResult(a, RC_SIGN_IN);
         // [END auth_fui_create_intent]
     }
 
@@ -58,10 +89,9 @@ public class Auth extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 setContentView(R.layout.activity_auth_confirm);
                 // Successfully signed in
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                System.out.println(user.getUid());
                 Intent next = new Intent(getApplicationContext(), Map.class);
                 startActivity(next);
+                finish();
                 // ...
             } else {
                 // Sign in failed. If response is null the user canceled the
