@@ -20,9 +20,6 @@ import java.util.Map;
 
 
 public class Kakaopay extends AppCompatActivity {
-
-
-
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {

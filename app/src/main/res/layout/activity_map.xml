@@ -2,10 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_map"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="center"
-    android:id="@+id/layout_map">
+    android:layout_gravity="center">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_h1"
@@ -133,13 +133,34 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.9" />
 
-    <fragment
-        android:id="@+id/map_fragment"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
+    <FrameLayout
+        android:id="@+id/fl1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <fragment
+            android:id="@+id/map_fragment"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </FrameLayout>
+
+
+    <FrameLayout
+        android:id="@+id/fl2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/guideline_h8"></FrameLayout>
 
     <ImageView
         android:id="@+id/realimage"
@@ -150,42 +171,46 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline_h8" />
 
-    <FrameLayout
-        android:id="@+id/fl"
+    <TextView
+        android:id="@+id/realname"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/guideline_h9"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_v6"
+        app:layout_constraintStart_toStartOf="@id/guideline_v3"
+        app:layout_constraintTop_toTopOf="@id/guideline_h8" />
+    <TextView
+        android:id="@+id/confirm"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:textSize="25sp"
+        app:layout_constraintBottom_toBottomOf="@id/guideline_h9"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/realname"
+        app:layout_constraintTop_toTopOf="@id/guideline_h8" />
+    <TextView
+        android:id="@+id/realprice"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_v6"
+        app:layout_constraintStart_toStartOf="@id/guideline_v3"
+        app:layout_constraintTop_toTopOf="@id/guideline_h9" />
+
+    <ImageButton
+        android:id="@+id/realconfim"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/clicker"
+        android:visibility="invisible"
+        android:background="@android:color/transparent"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/guideline_h8">
-
-        <TextView
-            android:id="@+id/realname"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@id/guideline_h9"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@id/guideline_v3"
-            app:layout_constraintTop_toTopOf="@id/guideline_h8"></TextView>
-
-        <TextView
-            android:id="@+id/realprice"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_v7"
-            app:layout_constraintStart_toStartOf="@id/guideline_v3"
-            app:layout_constraintTop_toTopOf="@id/guideline_h9"></TextView>
-
-        <Button
-            android:id="@+id/realtime"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/realprice"
-            app:layout_constraintTop_toTopOf="@id/guideline_h9"></Button>
-    </FrameLayout>
+        app:layout_constraintStart_toEndOf="@+id/realprice"
+        app:layout_constraintTop_toTopOf="@id/guideline_h9" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
