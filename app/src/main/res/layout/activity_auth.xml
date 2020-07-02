@@ -133,6 +133,19 @@
         app:layout_constraintGuide_percent="0.9" />
 
     <TextView
+        android:id="@+id/agreebt"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#000FFFFF"
+        android:textColor="#FFFFFF"
+        android:gravity="center"
+        android:text="@string/agreestring"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_v9"
+        app:layout_constraintStart_toStartOf="@+id/guideline_v1"
+        app:layout_constraintTop_toTopOf="@+id/guideline_h9" />
+
+    <TextView
         android:id="@+id/blinking_animation"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -144,6 +157,6 @@
         app:layout_constraintBottom_toTopOf="@+id/guideline_h9"
         app:layout_constraintEnd_toStartOf="@+id/guideline_v9"
         app:layout_constraintStart_toStartOf="@+id/guideline_v1"
-        app:layout_constraintTop_toTopOf="@+id/guideline_h8" />
+        app:layout_constraintTop_toTopOf="@+id/guideline_h7" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

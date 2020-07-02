@@ -1,6 +1,7 @@
 package com.gihoon.richardallright;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -18,6 +19,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -49,6 +51,11 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+
+        ActionBar ab;
+        ab = getSupportActionBar();
+        ab.hide();
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         fl1 = findViewById(R.id.fl1);
         fl1.bringToFront();
@@ -91,12 +98,15 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
             sydney = new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude());
         }
 
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        mMap.addMarker(new MarkerOptions().position(sydney).title("내 위치"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 15));
 
-        BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.logo);
-        Bitmap b=bitmapdraw.getBitmap();
-        final Bitmap smallMarker = Bitmap.createScaledBitmap(b, 200, 200, false);
+        BitmapDrawable bitmapdrawe=(BitmapDrawable)getResources().getDrawable(R.drawable.location_logo_available);
+        BitmapDrawable bitmapdrawf=(BitmapDrawable)getResources().getDrawable(R.drawable.location_logo_full);
+        Bitmap be=bitmapdrawe.getBitmap();
+        Bitmap bf=bitmapdrawf.getBitmap();
+        final Bitmap emptyMarker = Bitmap.createScaledBitmap(be, 150, 150, false);
+        final Bitmap fullMarker = Bitmap.createScaledBitmap(bf, 150,150,false);
         markers=new HashMap<String, HashMap>();
         db.collection("parkingLot")
                 .get()
@@ -110,7 +120,9 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
                                 Object x = a.get("x");
                                 Object y = a.get("y");
                                 LatLng b = new LatLng(Double.parseDouble(x.toString()), Double.parseDouble(y.toString()));
-                                MarkerOptions op = new MarkerOptions().position(b).icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
+                                MarkerOptions op = new MarkerOptions().position(b);
+                                if((Boolean)a.get("flag")) op.icon(BitmapDescriptorFactory.fromBitmap(emptyMarker));
+                                else op.icon(BitmapDescriptorFactory.fromBitmap(fullMarker));
                                 Marker l = mMap.addMarker(op.title(a.get("title").toString()));
                                 markers.put(l.getId(), a);
                             }
@@ -122,7 +134,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
     }
 
     @Override
-    public boolean onMarkerClick(Marker marker) {
+    public boolean onMarkerClick(final Marker marker) {
         if(markers.containsKey(marker.getId())) {
             System.out.println(markers.get(marker.getId()).get("title"));
             FrameLayout fl2 = findViewById(R.id.fl2);
@@ -142,9 +154,13 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
             realimage.bringToFront();
             realname.bringToFront();
             realprice.bringToFront();
-
             realconfirm.bringToFront();
-            realconfirm.setVisibility(View.VISIBLE);
+
+            if((Boolean) markers.get(marker.getId()).get("flag")) {
+                realconfirm.setVisibility(View.VISIBLE);
+            }else{
+                realconfirm.setVisibility(View.INVISIBLE);
+            }
             fl2.setOnClickListener(new FrameLayout.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -153,16 +169,18 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
             realconfirm.setOnClickListener(new ImageButton.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
+                    Toast.makeText(getApplicationContext(), "KakaoPay 앱이 실행됩니다", Toast.LENGTH_LONG).show();
                     String url = "https://kapi.kakao.com/v1/payment/ready";
 
                     ContentValues params = new ContentValues();
                     params.put("cid", "TC0ONETIME");
                     params.put("partner_order_id", "1001");
                     params.put("partner_user_id", "gorany");
-                    params.put("item_name", "갤럭시S9");
+                    params.put("item_name", markers.get(marker.getId()).get("title").toString());
                     params.put("quantity", "1");
-                    params.put("total_amount", "2100");
-                    params.put("tax_free_amount", "100");
+                    params.put("total_amount", markers.get(marker.getId()).get("price").toString());
+                    params.put("tax_free_amount", 0);
                     params.put("approval_url", "https://gihoonrar.page.link/?link=https://richardallright.com/payment&apn=com.gihoon.richardallright");
                     params.put("cancel_url", "https://gihoonrar.page.link/cancel");
                     params.put("fail_url", "https://gihoonrar.page.link/fail");
@@ -170,6 +188,8 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
                     networkTask.execute();
                 }
             });
+        }else{
+            fl1.bringToFront();
         }
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(),15));
         return false;
@@ -205,6 +225,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
             Intent intent = new Intent(getApplicationContext(), Kakaopay.class);
             intent.putExtra("url", redirectUrl);
             startActivity(intent);
+            finish();
         }
     }
 }

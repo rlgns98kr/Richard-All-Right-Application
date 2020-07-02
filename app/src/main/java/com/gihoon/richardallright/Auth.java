@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -20,7 +19,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class Auth extends AppCompatActivity {
@@ -39,6 +37,16 @@ public class Auth extends AppCompatActivity {
         TextView button = (TextView) findViewById(R.id.blinking_animation);
         Animation startAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.blink_animation);
         button.startAnimation(startAnimation);
+
+        TextView agreebt = findViewById(R.id.agreebt);
+        agreebt.setOnClickListener(new TextView.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                Intent next = new Intent(getApplication(),Agree.class);
+                startActivity(next);
+            }
+        });
 
         button.setOnClickListener(new TextView.OnClickListener(){
             @Override
@@ -68,8 +76,8 @@ public class Auth extends AppCompatActivity {
 
         Intent a = AuthUI.getInstance().createSignInIntentBuilder()
                 .setAvailableProviders(providers)
-                .setLogo(R.drawable.d)
-                .setTheme(AuthUI.getDefaultTheme())
+                .setLogo(R.drawable.b)
+                .setTheme(R.style.AppThemeFirebaseAuth)
                 .setIsSmartLockEnabled(true)
                 .build();
         //addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);

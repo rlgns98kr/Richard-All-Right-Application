@@ -18,6 +18,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".Agree"></activity>
+        <activity android:name=".Information" />
         <activity
             android:name=".Splash"
             android:screenOrientation="portrait"
@@ -58,16 +60,17 @@
             android:value="@string/facebook_application_id"
             tools:replace="android:value" />
 
-        <activity android:name=".Auth"
+        <activity
+            android:name=".Auth"
             android:screenOrientation="portrait"
-            android:theme="@style/SplashTheme"/>
+            android:theme="@style/SplashTheme" />
         <activity
             android:name=".Map"
             android:label="@string/title_activity_map" />
         <activity
-        android:name="com.facebook.FacebookActivity"
-        android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-        android:label="@string/app_name" />
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name" />
         <activity
             android:name="com.facebook.CustomTabActivity"
             android:exported="true">
