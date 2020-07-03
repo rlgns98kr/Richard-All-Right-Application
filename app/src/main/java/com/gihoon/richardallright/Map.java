@@ -18,7 +18,6 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
@@ -36,27 +35,53 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Transaction;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
-
 
 public class Map extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     String[] REQUIRED_PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private GoogleMap mMap;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+    FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
     LatLng sydney;
     HashMap<String, HashMap> markers;
-
+    private long backKeyPressedTime = 0;
+    // 첫 번째 뒤로가기 버튼을 누를때 표시
+    private Toast toast;
     @Override
-    public void onBackPressed() { }
+    public void onBackPressed() {
+        if (System.currentTimeMillis() > backKeyPressedTime + 2000) {
+            backKeyPressedTime = System.currentTimeMillis();
+            toast = Toast.makeText(this, "\'뒤로\' 버튼을 한번 더 누르시면 종료됩니다.", Toast.LENGTH_SHORT);
+            toast.show();
+            return;
+        }
+
+        if (System.currentTimeMillis() <= backKeyPressedTime + 2000) {
+            finish();
+            toast.cancel();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +94,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
 
         FloatingActionButton button = (FloatingActionButton) findViewById(R.id.menuButton);
 
-        final DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawer_layout);
+        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         button.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -77,13 +102,13 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
             }
         });
 
-        NavigationView navigationView = (NavigationView)findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener(){
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 drawer.closeDrawer(Gravity.RIGHT);
 
-                switch (item.getItemId()){
+                switch (item.getItemId()) {
                     case R.id.goToMyPage:
                         //마이페이지 이동 로직 추가
                         Intent mypa = new Intent(getApplication(), Information.class);
@@ -91,6 +116,11 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
                         startActivity(mypa);
                         break;
                     case R.id.goToLogOut:
+                        FirebaseAuth.getInstance().signOut();
+                        Intent mype = new Intent(getApplication(), Auth.class);
+                        mype.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(mype);
+                        finish();
                         //로그아웃 이동 로직 추가
                         break;
                 }
@@ -117,10 +147,10 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
             }
         });
         FloatingActionButton dkdk = findViewById(R.id.location);
-        dkdk.setOnClickListener(new FloatingActionButton.OnClickListener(){
+        dkdk.setOnClickListener(new FloatingActionButton.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(),"위치를 업데이트합니다.\n권한이 없을 경우 기본 위치로 설정됩니다.",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "위치를 업데이트합니다.\n권한이 없을 경우 기본 위치로 설정됩니다.", Toast.LENGTH_SHORT).show();
                 if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     update_location();
                 } else {
@@ -128,11 +158,22 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
                 }
             }
         });
+        ImageView iv = findViewById(R.id.action_image);
+        TextView tv = findViewById(R.id.action_name);
+
+        if (currentUser.getPhotoUrl() != null) {
+            Glide.with(this).load(currentUser.getPhotoUrl()).into(iv);
+        }
+        if (!currentUser.getDisplayName().equals("")) {
+            tv.setText(currentUser.getDisplayName());
+        }
     }
+
     @Override
     public void onRequestPermissionsResult(int permsRequestCode, @NonNull String[] permissions, @NonNull int[] grandResults) {
         if (permsRequestCode == 100 && grandResults.length == 2) update_location();
     }
+
     @SuppressLint("MissingPermission")
     public void update_location() {
         if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -145,13 +186,13 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
         mMap.addMarker(new MarkerOptions().position(sydney).title("내 위치"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 15));
 
-        BitmapDrawable bitmapdrawe=(BitmapDrawable)getResources().getDrawable(R.drawable.location_logo_available);
-        BitmapDrawable bitmapdrawf=(BitmapDrawable)getResources().getDrawable(R.drawable.location_logo_full);
-        Bitmap be=bitmapdrawe.getBitmap();
-        Bitmap bf=bitmapdrawf.getBitmap();
+        BitmapDrawable bitmapdrawe = (BitmapDrawable) getResources().getDrawable(R.drawable.location_logo_available);
+        BitmapDrawable bitmapdrawf = (BitmapDrawable) getResources().getDrawable(R.drawable.location_logo_full);
+        Bitmap be = bitmapdrawe.getBitmap();
+        Bitmap bf = bitmapdrawf.getBitmap();
         final Bitmap emptyMarker = Bitmap.createScaledBitmap(be, 150, 150, false);
-        final Bitmap fullMarker = Bitmap.createScaledBitmap(bf, 150,150,false);
-        markers=new HashMap<String, HashMap>();
+        final Bitmap fullMarker = Bitmap.createScaledBitmap(bf, 150, 150, false);
+        markers = new HashMap<String, HashMap>();
         db.collection("parkingLot")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -160,12 +201,13 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 HashMap a = (HashMap) document.getData();
-
+                                a.put("id", document.getId());
                                 Object x = a.get("x");
                                 Object y = a.get("y");
                                 LatLng b = new LatLng(Double.parseDouble(x.toString()), Double.parseDouble(y.toString()));
                                 MarkerOptions op = new MarkerOptions().position(b);
-                                if((Boolean)a.get("flag")) op.icon(BitmapDescriptorFactory.fromBitmap(emptyMarker));
+                                if ((Boolean) a.get("flag"))
+                                    op.icon(BitmapDescriptorFactory.fromBitmap(emptyMarker));
                                 else op.icon(BitmapDescriptorFactory.fromBitmap(fullMarker));
                                 Marker l = mMap.addMarker(op.title(a.get("title").toString()));
                                 markers.put(l.getId(), a);
@@ -179,7 +221,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
 
     @Override
     public boolean onMarkerClick(final Marker marker) {
-        if(markers.containsKey(marker.getId())) {
+        if (markers.containsKey(marker.getId())) {
             System.out.println(markers.get(marker.getId()).get("title"));
             LinearLayout fl2 = findViewById(R.id.fl2);
             ImageView realimage = findViewById(R.id.realimage);
@@ -189,18 +231,20 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
             ImageButton realconfirm = findViewById(R.id.realconfim);
 
             realname.setText(marker.getTitle());
-            realprice.setText(markers.get(marker.getId()).get("price").toString()+"원");
+            realprice.setText(markers.get(marker.getId()).get("price").toString() + "원");
             realaddress.setText(markers.get(marker.getId()).get("address").toString());
 
             fl2.setVisibility(View.VISIBLE);
-            if(markers.get(marker.getId()).get("imageUrl")!=null) {
+            if (markers.get(marker.getId()).get("imageUrl") != null) {
                 Glide.with(getApplicationContext())
                         .load(markers.get(marker.getId()).get("imageUrl"))
                         .into(realimage);
+            }else {
+                realimage.setImageResource(R.mipmap.ic_launcher);
             }
-            if((Boolean) markers.get(marker.getId()).get("flag")) {
+            if ((Boolean) markers.get(marker.getId()).get("flag")) {
                 realconfirm.setVisibility(View.VISIBLE);
-            }else{
+            } else {
                 realconfirm.setVisibility(View.INVISIBLE);
             }
             fl2.setOnClickListener(new LinearLayout.OnClickListener() {
@@ -211,30 +255,85 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
             realconfirm.setOnClickListener(new ImageButton.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    final DocumentReference sfDocRef = db.collection("parkingLot").document(markers.get(marker.getId()).get("id").toString());
 
+                    db.runTransaction(new Transaction.Function<Boolean>() {
+                        @Override
+                        public Boolean apply(Transaction transaction) throws FirebaseFirestoreException {
+                            DocumentSnapshot snapshot = transaction.get(sfDocRef);
+                            boolean newPopulation = !snapshot.getBoolean("flag");
+                            if (!newPopulation) {
+                                transaction.update(sfDocRef, "flag", newPopulation);
+                                return newPopulation;
+                            } else {
+                                throw new FirebaseFirestoreException("Population too high",
+                                        FirebaseFirestoreException.Code.ABORTED);
+                            }
+                        }
+                    }).addOnSuccessListener(new OnSuccessListener<Boolean>() {
+                        @Override
+                        public void onSuccess(Boolean result) {
+                            Date date = new Date();
+                            Calendar calendar = new GregorianCalendar();
+                            calendar.setTime(date);
+                            String year = String.valueOf(calendar.get(Calendar.YEAR));
+                            String month = String.valueOf(calendar.get(Calendar.MONTH) + 1);
+                            String day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
+                            if (month.length() == 1) month = "0" + month;
+                            if (day.length() == 1) day = "0" + day;
 
-                    Toast.makeText(getApplicationContext(), "KakaoPay 앱이 실행됩니다", Toast.LENGTH_LONG).show();
-                    String url = "https://kapi.kakao.com/v1/payment/ready";
+                            System.out.println("Transaction success: " + result);
+                            HashMap<String, Object> data = new HashMap<>();
+                            data.put("uid", currentUser.getUid());
+                            data.put("parkingLotId", markers.get(marker.getId()).get("id"));
+                            data.put("date", year + month + day);
 
-                    ContentValues params = new ContentValues();
-                    params.put("cid", "TC0ONETIME");
-                    params.put("partner_order_id", "1001");
-                    params.put("partner_user_id", "gihoony");
-                    params.put("item_name", markers.get(marker.getId()).get("title").toString());
-                    params.put("quantity", "1");
-                    params.put("total_amount", markers.get(marker.getId()).get("price").toString());
-                    params.put("tax_free_amount", 0);
-                    params.put("approval_url", "https://gihoonrar.page.link/?link=https://richardallright.com/payment&apn=com.gihoon.richardallright");
-                    params.put("cancel_url", "https://gihoonrar.page.link/cancel");
-                    params.put("fail_url", "https://gihoonrar.page.link/fail");
-                    NetworkTask networkTask = new NetworkTask(url, params);
-                    networkTask.execute();
+                            db.collection("reservation")
+                                    .add(data)
+                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                        @Override
+                                        public void onSuccess(DocumentReference documentReference) {
+                                            Toast.makeText(getApplicationContext(), "KakaoPay 앱이 실행됩니다", Toast.LENGTH_LONG).show();
+                                            String url = "https://kapi.kakao.com/v1/payment/ready";
+
+                                            ContentValues params = new ContentValues();
+                                            params.put("cid", "TC0ONETIME");
+                                            params.put("partner_order_id", "1001");
+                                            params.put("partner_user_id", "gihoony");
+                                            params.put("item_name", markers.get(marker.getId()).get("title").toString());
+                                            params.put("quantity", "1");
+                                            params.put("total_amount", markers.get(marker.getId()).get("price").toString());
+                                            params.put("tax_free_amount", 0);
+                                            params.put("approval_url", "https://gihoonrar.page.link/?link=https://richardallright.com/payment&apn=com.gihoon.richardallright");
+                                            params.put("cancel_url", "https://gihoonrar.page.link/cancel");
+                                            params.put("fail_url", "https://gihoonrar.page.link/fail");
+                                            NetworkTask networkTask = new NetworkTask(url, params);
+                                            networkTask.execute();
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            sfDocRef.update("flag", false);
+                                            Intent a = new Intent(getApplicationContext(), Map.class);
+                                            a.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                            startActivity(a);
+                                            finish();
+                                        }
+                                    });
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(getApplicationContext(), "이미 예약된 자리입니다.\n왼쪽 상단의 위치 갱신 버튼을 눌러 위치를 갱신하세요.", Toast.LENGTH_LONG);
+                        }
+                    });
                 }
             });
-        }else{
+        } else {
             //fl1.bringToFront();
         }
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(),15));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 15));
         return false;
     }
 

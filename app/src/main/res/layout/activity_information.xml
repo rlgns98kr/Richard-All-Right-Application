@@ -158,6 +158,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
+            android:adjustViewBounds="true"
             android:src="@drawable/com_facebook_profile_picture_blank_portrait" />
 
     </androidx.cardview.widget.CardView>

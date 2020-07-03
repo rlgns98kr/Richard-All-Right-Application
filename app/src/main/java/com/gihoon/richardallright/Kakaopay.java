@@ -1,6 +1,5 @@
 package com.gihoon.richardallright;
 
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;

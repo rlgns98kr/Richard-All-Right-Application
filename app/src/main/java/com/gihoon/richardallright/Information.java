@@ -1,12 +1,10 @@
 package com.gihoon.richardallright;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcel;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -19,16 +17,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.auth.FirebaseAuthCredentialsProvider;
-
 
 import java.util.Calendar;
 import java.util.Date;
@@ -59,8 +53,22 @@ public class Information extends AppCompatActivity {
                 Intent ab = new Intent(getApplication(), Map.class);
                 ab.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(ab);
+                finish();
             }
         });
+        Date date = new Date();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+
+        final String year = String.valueOf(calendar.get(Calendar.YEAR));
+        String month = String.valueOf(calendar.get(Calendar.MONTH) + 1);
+        String day =  String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
+
+        if(month.length()==1) month = "0"+month;
+        if(day.length()==1) day = "0"+day;
+
+        final String finalmonth = month;
+        final String finalday = day;
 
         Button remove = findViewById(R.id.remove);
         remove.setOnClickListener(new Button.OnClickListener() {
@@ -68,6 +76,7 @@ public class Information extends AppCompatActivity {
             public void onClick(View v) {
                 db.collection("reservation")
                         .whereEqualTo("uid", currentUser.getUid())
+                        .whereEqualTo("date", year+ finalmonth+finalday)
                         .get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
@@ -85,6 +94,7 @@ public class Information extends AppCompatActivity {
                                                 Intent bbb = new Intent(getApplication(), Map.class);
                                                 bbb.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                                 startActivity(bbb);
+                                                finish();
                                             }
                                         }).addOnFailureListener(new OnFailureListener() {
 
@@ -103,18 +113,6 @@ public class Information extends AppCompatActivity {
             }
         });
 
-        Date date = new Date();
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTime(date);
-
-        String year = String.valueOf(calendar.get(Calendar.YEAR));
-        String month = String.valueOf(calendar.get(Calendar.MONTH) + 1);
-        String day =  String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
-
-        if(month.length()==1) month = "0"+month;
-        if(day.length()==1) day = "0"+day;
-
-        System.out.println(year+month+day);
         db.collection("reservation")
                 .whereEqualTo("uid", currentUser.getUid())
                 .whereEqualTo("date", year+month+day)

@@ -6,7 +6,6 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/goToMyPage"
-            android:icon="@drawable/com_facebook_profile_picture_blank_portrait"
             android:title="My Page" />
         <item
             android:id="@+id/goToLogOut"
