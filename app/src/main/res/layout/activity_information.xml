@@ -146,19 +146,19 @@
     <androidx.cardview.widget.CardView
         android:layout_width="120dp"
         android:layout_height="120dp"
+        app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="120dp"
         app:layout_constraintBottom_toBottomOf="@id/guideline_h3"
         app:layout_constraintEnd_toStartOf="@id/guideline_v4"
         app:layout_constraintStart_toStartOf="@+id/guideline_v1"
-        app:layout_constraintTop_toTopOf="parent"
-        app:cardBackgroundColor="@color/white">
+        app:layout_constraintTop_toTopOf="parent">
 
-            <ImageView
-                android:id="@+id/userview"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:src="@drawable/com_facebook_profile_picture_blank_portrait"
-                android:scaleType="centerCrop"/>
+        <ImageView
+            android:id="@+id/userview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/com_facebook_profile_picture_blank_portrait" />
 
     </androidx.cardview.widget.CardView>
 
@@ -166,7 +166,7 @@
         android:id="@+id/username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="My Name"
+        android:text="익 명"
         app:layout_constraintBottom_toBottomOf="@id/guideline_h1"
         app:layout_constraintStart_toStartOf="@+id/guideline_v5" />
 
@@ -188,37 +188,33 @@
     <LinearLayout
         android:id="@+id/reservationLayout"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="0dp"
         android:baselineAligned="false"
         android:orientation="vertical"
-        android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+        app:layout_constraintTop_toBottomOf="@id/guideline_h3">
 
         <TextView
-            android:id="@+id/ConstraintLayout"
-            android:layout_width="208dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="#FFFFFF"
-            android:gravity="center"
-            android:text="one room"
-            android:textSize="18sp" />
-
-        <ImageView
-            android:id="@+id/imageView3"
+            android:id="@+id/oneroomname"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="40dp"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/oneroomimage"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="5dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
             app:srcCompat="@drawable/ic_launcher_foreground" />
 
         <TextView
@@ -226,44 +222,49 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:padding="10dp"
-            android:text="서울시 테헤란로121" />
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="예약된 자리가 없습니다!"
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/reservText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:padding="10dp"
-            android:text="예약 된 자리는 3번 오후 6시까지 이용 가능합니다.\n 안녕하세요" />
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="안녕 안녕하세요~!\n예약 된 자리는 오후 6시까지 이용 가능합니다."
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:visibility="invisible" />
+
+        <Button
+            android:id="@+id/remove"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/btnrount_logo"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:text="예약 취소"
+            android:textColor="#515151"
+            android:textSize="18sp"
+            android:visibility="invisible" />
 
         <Button
             android:id="@+id/homemove"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:background="@drawable/btnrount_logo"
             android:layout_marginTop="20dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:text="예약 취소"
-            android:textColor="#515151"
-            android:textSize="18sp" />
-
-        <Button
-            android:id="@+id/remove"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:layout_gravity="center"
             android:background="@drawable/btnrount"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
             android:text="홈으로"
             android:textColor="#515151"
             android:textSize="18sp" />
-
     </LinearLayout>
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

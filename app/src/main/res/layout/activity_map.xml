@@ -152,65 +152,64 @@
     </FrameLayout>
 
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/fl2"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:background="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/guideline_h8"></FrameLayout>
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent">
+        <ImageView
+            android:id="@+id/realimage"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/com_facebook_profile_picture_blank_portrait" />
 
-    <ImageView
-        android:id="@+id/realimage"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/guideline_v3"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline_h8" />
+        <TextView
+            android:id="@+id/realname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginTop="20dp"
+            android:text="원룸이름"
+            android:textColor="#000000"
+            android:textSize="30sp" />
 
-    <TextView
-        android:id="@+id/realname"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/guideline_h9"
-        app:layout_constraintEnd_toStartOf="@+id/guideline_v6"
-        app:layout_constraintStart_toStartOf="@id/guideline_v3"
-        app:layout_constraintTop_toTopOf="@id/guideline_h8" />
-    <TextView
-        android:id="@+id/confirm"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:gravity="center"
-        android:textSize="25sp"
-        app:layout_constraintBottom_toBottomOf="@id/guideline_h9"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/realname"
-        app:layout_constraintTop_toTopOf="@id/guideline_h8" />
-    <TextView
-        android:id="@+id/realprice"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/guideline_v6"
-        app:layout_constraintStart_toStartOf="@id/guideline_v3"
-        app:layout_constraintTop_toTopOf="@id/guideline_h9" />
-
-    <ImageButton
-        android:id="@+id/realconfim"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:src="@drawable/clicker"
-        android:visibility="invisible"
-        android:background="@android:color/transparent"
-        android:adjustViewBounds="true"
-        android:scaleType="fitCenter"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/realprice"
-        app:layout_constraintTop_toTopOf="@id/guideline_h9" />
+        <TextView
+            android:id="@+id/realaddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="경기도 용인시 수지구 수지로342번길 18"
+            android:textColor="#000000"
+            android:textSize="15sp" />
 
 
+        <TextView
+            android:id="@+id/realprice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:text="price원"
+            android:textColor="#000000"
+            android:textSize="24sp" />
+
+        <ImageButton
+            android:id="@+id/realconfim"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:adjustViewBounds="true"
+            android:background="@android:color/transparent"
+            android:scaleType="fitCenter"
+            android:src="@drawable/clicker"
+            android:visibility="visible" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

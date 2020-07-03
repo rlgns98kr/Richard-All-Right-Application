@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -137,24 +138,17 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
     public boolean onMarkerClick(final Marker marker) {
         if(markers.containsKey(marker.getId())) {
             System.out.println(markers.get(marker.getId()).get("title"));
-            FrameLayout fl2 = findViewById(R.id.fl2);
+            LinearLayout fl2 = findViewById(R.id.fl2);
             ImageView realimage = findViewById(R.id.realimage);
             TextView realname = findViewById(R.id.realname);
-            TextView confirm = findViewById(R.id.confirm);
             TextView realprice = findViewById(R.id.realprice);
             ImageButton realconfirm = findViewById(R.id.realconfim);
 
-            confirm.setText("예약하기");
             realname.setText(marker.getTitle());
             realprice.setText(markers.get(marker.getId()).get("price").toString());
 
 
             fl2.bringToFront();
-            confirm.bringToFront();
-            realimage.bringToFront();
-            realname.bringToFront();
-            realprice.bringToFront();
-            realconfirm.bringToFront();
 
             if((Boolean) markers.get(marker.getId()).get("flag")) {
                 realconfirm.setVisibility(View.VISIBLE);
@@ -169,6 +163,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
             realconfirm.setOnClickListener(new ImageButton.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
 
                     Toast.makeText(getApplicationContext(), "KakaoPay 앱이 실행됩니다", Toast.LENGTH_LONG).show();
                     String url = "https://kapi.kakao.com/v1/payment/ready";
