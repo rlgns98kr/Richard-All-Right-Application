@@ -30,17 +30,12 @@ public class Auth extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
 
-        ActionBar ab;
-        ab = getSupportActionBar();
-        ab.hide();
-
         TextView button = (TextView) findViewById(R.id.blinking_animation);
         Animation startAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.blink_animation);
         button.startAnimation(startAnimation);
 
         TextView agreebt = findViewById(R.id.agreebt);
         agreebt.setOnClickListener(new TextView.OnClickListener(){
-
             @Override
             public void onClick(View v) {
                 Intent next = new Intent(getApplication(),Agree.class);

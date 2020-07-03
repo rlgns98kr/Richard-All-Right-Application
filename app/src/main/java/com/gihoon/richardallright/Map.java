@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -14,10 +15,13 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +35,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -50,19 +56,41 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_map);
-
-        ActionBar ab;
-        ab = getSupportActionBar();
-        ab.hide();
+        //setContentView(R.layout.activity_map);
+        setContentView(R.layout.activity_map_layout);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         fl1 = findViewById(R.id.fl1);
-        fl1.bringToFront();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map_fragment);
         mapFragment.getMapAsync(this);
+
+
+        FloatingActionButton button = (FloatingActionButton) findViewById(R.id.menuButton);
+
+        DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawer_layout);
+        button.setOnClickListener(view -> {
+            drawer.openDrawer(Gravity.RIGHT);
+        });
+
+        NavigationView navigationView = (NavigationView)findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(item -> {
+            drawer.closeDrawer(Gravity.RIGHT);
+
+            switch (item.getItemId()){
+                case R.id.goToMyPage:
+                    //마이페이지 이동 로직 추가
+                    Toast.makeText(this, "마이 페이지로 이동합니다.", Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.goToLogOut:
+                    //로그아웃 이동 로직 추가
+                    Toast.makeText(this, "로그아웃 합니다.", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+
+            return true;
+        });
     }
 
     @Override
@@ -77,9 +105,9 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                fl1.bringToFront();
-                ImageButton a=findViewById(R.id.realconfim);
-                a.setVisibility(View.INVISIBLE);
+                //fl1.bringToFront();
+                //ImageButton a=findViewById(R.id.realconfim);
+                //a.setVisibility(View.INVISIBLE);
             }
         });
     }
@@ -189,7 +217,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
                 }
             });
         }else{
-            fl1.bringToFront();
+            //fl1.bringToFront();
         }
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(),15));
         return false;
