@@ -26,10 +26,6 @@ public class Kakaopay extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_kakaopay);
 
-        ActionBar ab;
-        ab = getSupportActionBar();
-        ab.hide();
-
         WebView wV = findViewById(R.id.webview);
         Intent before = getIntent();
         String url = before.getStringExtra("url");

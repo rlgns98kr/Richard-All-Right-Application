@@ -6,24 +6,33 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcel;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.auth.FirebaseAuthCredentialsProvider;
 
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 public class Information extends AppCompatActivity {
@@ -35,10 +44,6 @@ public class Information extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_information);
 
-        ActionBar ab;
-        ab = getSupportActionBar();
-        ab.hide();
-
         ImageView userview = findViewById(R.id.userview);
         TextView username = findViewById(R.id.username);
         if (currentUser.getPhotoUrl() != null) {
@@ -48,7 +53,7 @@ public class Information extends AppCompatActivity {
             username.setText(currentUser.getDisplayName());
         }
         Button bt = findViewById(R.id.homemove);
-        bt.setOnClickListener(new View.OnClickListener() {
+        bt.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent ab = new Intent(getApplication(), Map.class);
@@ -56,9 +61,63 @@ public class Information extends AppCompatActivity {
                 startActivity(ab);
             }
         });
-        Date a = new Date(System.currentTimeMillis());
+
+        Button remove = findViewById(R.id.remove);
+        remove.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                db.collection("reservation")
+                        .whereEqualTo("uid", currentUser.getUid())
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        HashMap a = (HashMap) document.getData();
+                                        String docname = a.get("parkingLotId").toString();
+                                        final String docId = document.getId();
+                                        db.collection("parkingLot").document(docname).update("flag", true).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                System.out.println("DocumentSnapshot successfully updated!");
+                                                db.collection("reservation").document(docId).delete();
+                                                Intent bbb = new Intent(getApplication(), Map.class);
+                                                bbb.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                startActivity(bbb);
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                System.out.println("Error updating document");
+                                                Toast.makeText(getApplicationContext(),"예약 삭제에 실패하였습니다. 잠시후 다시 시도해주세요!",Toast.LENGTH_SHORT);
+                                            }
+                                        });
+                                    }
+                                } else {
+                                    System.out.println(task.getException());
+                                }
+                            }
+                        });
+            }
+        });
+
+        Date date = new Date();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+
+        String year = String.valueOf(calendar.get(Calendar.YEAR));
+        String month = String.valueOf(calendar.get(Calendar.MONTH) + 1);
+        String day =  String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
+
+        if(month.length()==1) month = "0"+month;
+        if(day.length()==1) day = "0"+day;
+
+        System.out.println(year+month+day);
         db.collection("reservation")
                 .whereEqualTo("uid", currentUser.getUid())
+                .whereEqualTo("date", year+month+day)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override

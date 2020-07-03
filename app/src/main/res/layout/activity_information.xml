@@ -170,21 +170,6 @@
         app:layout_constraintBottom_toBottomOf="@id/guideline_h1"
         app:layout_constraintStart_toStartOf="@+id/guideline_v5" />
 
-    <Button
-        android:id="@+id/outuser"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="@drawable/btnrount_white"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        android:text="회원 탈퇴"
-        android:textColor="#515151"
-        android:textSize="15sp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline_h3"
-        app:layout_constraintStart_toStartOf="@+id/guideline_v5"
-        app:layout_constraintTop_toTopOf="@+id/guideline_h1" />
-
     <LinearLayout
         android:id="@+id/reservationLayout"
         android:layout_width="0dp"

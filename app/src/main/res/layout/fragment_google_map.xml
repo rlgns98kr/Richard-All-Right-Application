@@ -17,14 +17,89 @@
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/tomyeongGreen"
+        android:clickable="true"
+        android:layout_margin="10sp"
+        android:layout_gravity="start|top"
+        app:srcCompat="@android:drawable/ic_menu_mylocation" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/menuButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@color/tomyeongGreen"
         android:clickable="true"
         android:layout_margin="10sp"
         android:layout_gravity="end|top"
-        app:srcCompat="@android:drawable/ic_input_add"
         android:focusable="true" />
+
+
+
+    <LinearLayout
+        android:id="@+id/fl2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="vertical"
+        android:layout_gravity="bottom"
+        android:visibility="invisible">
+        <ImageView
+            android:id="@+id/realimage"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/com_facebook_profile_picture_blank_portrait" />
+
+        <TextView
+            android:id="@+id/realname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginTop="20dp"
+            android:text="원룸이름"
+            android:textColor="#000000"
+            android:textSize="30sp" />
+
+        <TextView
+            android:id="@+id/realaddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="경기도 용인시 수지구 수지로342번길 18"
+            android:textColor="#000000"
+            android:textSize="15sp" />
+
+
+        <TextView
+            android:id="@+id/realprice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:text="price원"
+            android:textColor="#000000"
+            android:textSize="24sp" />
+
+        <ImageButton
+            android:id="@+id/realconfim"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:adjustViewBounds="true"
+            android:background="@android:color/transparent"
+            android:scaleType="fitCenter"
+            android:src="@drawable/clicker"
+            android:visibility="visible" />
+    </LinearLayout>
+
+
 </FrameLayout>

@@ -1,7 +1,6 @@
 package com.gihoon.richardallright;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -23,10 +22,11 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
-import android.widget.Switch;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -47,8 +47,6 @@ import com.google.gson.JsonParser;
 
 import java.util.HashMap;
 
-import static android.widget.Toast.LENGTH_SHORT;
-
 
 public class Map extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     String[] REQUIRED_PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
@@ -56,20 +54,18 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     LatLng sydney;
     HashMap<String, HashMap> markers;
-    FrameLayout fl1;
+
+    @Override
+    public void onBackPressed() { }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_map);
-        setContentView(R.layout.activity_map_layout);
-
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        fl1 = findViewById(R.id.fl1);
+        setContentView(R.layout.activity_map);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map_fragment);
         mapFragment.getMapAsync(this);
-
 
         FloatingActionButton button = (FloatingActionButton) findViewById(R.id.menuButton);
 
@@ -90,7 +86,9 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
                 switch (item.getItemId()){
                     case R.id.goToMyPage:
                         //마이페이지 이동 로직 추가
-
+                        Intent mypa = new Intent(getApplication(), Information.class);
+                        mypa.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(mypa);
                         break;
                     case R.id.goToLogOut:
                         //로그아웃 이동 로직 추가
@@ -114,18 +112,27 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                //fl1.bringToFront();
-                //ImageButton a=findViewById(R.id.realconfim);
-                //a.setVisibility(View.INVISIBLE);
+                LinearLayout fl2 = findViewById(R.id.fl2);
+                fl2.setVisibility(View.INVISIBLE);
+            }
+        });
+        FloatingActionButton dkdk = findViewById(R.id.location);
+        dkdk.setOnClickListener(new FloatingActionButton.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(),"위치를 업데이트합니다.\n권한이 없을 경우 기본 위치로 설정됩니다.",Toast.LENGTH_SHORT).show();
+                if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    update_location();
+                } else {
+                    ActivityCompat.requestPermissions(getParent(), REQUIRED_PERMISSIONS, 100);
+                }
             }
         });
     }
-
     @Override
     public void onRequestPermissionsResult(int permsRequestCode, @NonNull String[] permissions, @NonNull int[] grandResults) {
         if (permsRequestCode == 100 && grandResults.length == 2) update_location();
     }
-
     @SuppressLint("MissingPermission")
     public void update_location() {
         if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -134,7 +141,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
             GpsTracker gpsTracker = new GpsTracker(getApplicationContext());
             sydney = new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude());
         }
-
+        mMap.clear();
         mMap.addMarker(new MarkerOptions().position(sydney).title("내 위치"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 15));
 
@@ -177,21 +184,26 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
             LinearLayout fl2 = findViewById(R.id.fl2);
             ImageView realimage = findViewById(R.id.realimage);
             TextView realname = findViewById(R.id.realname);
+            TextView realaddress = findViewById(R.id.realaddress);
             TextView realprice = findViewById(R.id.realprice);
             ImageButton realconfirm = findViewById(R.id.realconfim);
 
             realname.setText(marker.getTitle());
-            realprice.setText(markers.get(marker.getId()).get("price").toString());
+            realprice.setText(markers.get(marker.getId()).get("price").toString()+"원");
+            realaddress.setText(markers.get(marker.getId()).get("address").toString());
 
-
-            fl2.bringToFront();
-
+            fl2.setVisibility(View.VISIBLE);
+            if(markers.get(marker.getId()).get("imageUrl")!=null) {
+                Glide.with(getApplicationContext())
+                        .load(markers.get(marker.getId()).get("imageUrl"))
+                        .into(realimage);
+            }
             if((Boolean) markers.get(marker.getId()).get("flag")) {
                 realconfirm.setVisibility(View.VISIBLE);
             }else{
                 realconfirm.setVisibility(View.INVISIBLE);
             }
-            fl2.setOnClickListener(new FrameLayout.OnClickListener() {
+            fl2.setOnClickListener(new LinearLayout.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                 }
@@ -207,7 +219,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
                     ContentValues params = new ContentValues();
                     params.put("cid", "TC0ONETIME");
                     params.put("partner_order_id", "1001");
-                    params.put("partner_user_id", "gorany");
+                    params.put("partner_user_id", "gihoony");
                     params.put("item_name", markers.get(marker.getId()).get("title").toString());
                     params.put("quantity", "1");
                     params.put("total_amount", markers.get(marker.getId()).get("price").toString());
