@@ -15,11 +15,6 @@ public class Payment_confirm extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // ATTENTION: This was auto-generated to handle app links.
-
-        ActionBar ab;
-        ab = getSupportActionBar();
-        ab.hide();
 
         Intent appLinkIntent = getIntent();
         String appLinkData = appLinkIntent.getStringExtra("pg_token");
