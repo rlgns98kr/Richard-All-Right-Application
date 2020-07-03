@@ -225,7 +225,6 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
             Intent intent = new Intent(getApplicationContext(), Kakaopay.class);
             intent.putExtra("url", redirectUrl);
             startActivity(intent);
-            finish();
         }
     }
 }

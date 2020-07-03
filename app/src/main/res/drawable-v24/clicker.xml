@@ -4,7 +4,7 @@
         android:drawable="@drawable/payment_icon_yellow_medium"
         android:state_pressed="false" />
     <item
-        android:drawable="@drawable/b"
+        android:drawable="@drawable/payment_icon_gal_medium"
         android:state_pressed="true"
         />
 </selector>
