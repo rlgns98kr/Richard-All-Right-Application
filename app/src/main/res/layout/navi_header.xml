@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#ff0000"
+    android:background="@color/tomyeongGreen"
     android:orientation="horizontal"
     android:paddingLeft="16dp"
     android:paddingTop="16dp"
@@ -33,6 +33,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
+        android:textColor="#222121"
         android:layout_marginLeft="20dp"
         android:text="익 명"/>
 </LinearLayout>

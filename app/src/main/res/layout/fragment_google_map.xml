@@ -17,26 +17,33 @@
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+
+    <ImageButton
         android:id="@+id/location"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/tomyeongGreen"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:clickable="true"
-        android:layout_margin="10sp"
         android:layout_gravity="start|top"
-        app:srcCompat="@android:drawable/ic_menu_mylocation" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/menuButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/tomyeongGreen"
-        android:clickable="true"
         android:layout_margin="10sp"
+        android:adjustViewBounds="true"
+        android:focusable="true"
+        android:background="@android:color/transparent"
+        android:scaleType="fitCenter"
+        android:src="@drawable/locationclicker"
+        android:visibility="visible" />
+    <ImageButton
+        android:id="@+id/menuButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:clickable="true"
         android:layout_gravity="end|top"
-        android:focusable="true" />
-
+        android:layout_margin="10sp"
+        android:adjustViewBounds="true"
+        android:focusable="true"
+        android:background="@android:color/transparent"
+        android:scaleType="fitCenter"
+        android:src="@drawable/menuclicker"
+        android:visibility="visible" />
 
 
     <LinearLayout

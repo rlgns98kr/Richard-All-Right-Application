@@ -9,6 +9,6 @@
             android:title="My Page" />
         <item
             android:id="@+id/goToLogOut"
-            android:title="Logout" />
+            android:title="LogOut" />
     </group>
 </menu>

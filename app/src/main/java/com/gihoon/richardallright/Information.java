@@ -46,16 +46,7 @@ public class Information extends AppCompatActivity {
         if (!currentUser.getDisplayName().equals("")) {
             username.setText(currentUser.getDisplayName());
         }
-        Button bt = findViewById(R.id.homemove);
-        bt.setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent ab = new Intent(getApplication(), Map.class);
-                ab.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(ab);
-                finish();
-            }
-        });
+
         Date date = new Date();
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(date);
@@ -69,7 +60,64 @@ public class Information extends AppCompatActivity {
 
         final String finalmonth = month;
         final String finalday = day;
+        db.collection("reservation")
+                .whereEqualTo("uid", currentUser.getUid())
+                .whereEqualTo("date", year+month+day)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                HashMap a = (HashMap) document.getData();
+                                String docname = a.get("parkingLotId").toString();
 
+                                db.collection("parkingLot").document(docname).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> taska) {
+                                        if (taska.isSuccessful()) {
+                                            DocumentSnapshot documentSnapshot = taska.getResult();
+                                            TextView resertt = findViewById(R.id.reservText);
+                                            TextView address = findViewById(R.id.roomAddress);
+                                            TextView name = findViewById(R.id.oneroomname);
+                                            Button remove = findViewById(R.id.remove);
+                                            if (documentSnapshot.exists()) {
+                                                resertt.setVisibility(View.VISIBLE);
+                                                ImageView imageView = findViewById(R.id.oneroomimage);
+                                                if(documentSnapshot.get("imageUrl")!=null) {
+                                                    Glide.with(getApplicationContext())
+                                                            .load(documentSnapshot.get("imageUrl"))
+                                                            .into(imageView);
+                                                }
+                                                address.setText(documentSnapshot.get("address").toString());
+                                                name.setText(documentSnapshot.get("title").toString());
+
+                                                remove.setVisibility(View.VISIBLE);
+                                            } else {
+                                                System.out.println("No such document");
+                                                remove.setVisibility(View.INVISIBLE);
+                                                resertt.setVisibility(View.INVISIBLE);
+                                            }
+                                        } else
+                                            System.out.println("get failed with " + taska.getException());
+                                    }
+                                });
+                            }
+                        } else {
+                            System.out.println(task.getException());
+                        }
+                    }
+                });
+        Button bt = findViewById(R.id.homemove);
+        bt.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent ab = new Intent(getApplication(), Map.class);
+                ab.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(ab);
+                finish();
+            }
+        });
         Button remove = findViewById(R.id.remove);
         remove.setOnClickListener(new Button.OnClickListener() {
             @Override
@@ -113,51 +161,6 @@ public class Information extends AppCompatActivity {
             }
         });
 
-        db.collection("reservation")
-                .whereEqualTo("uid", currentUser.getUid())
-                .whereEqualTo("date", year+month+day)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                HashMap a = (HashMap) document.getData();
-                                String docname = a.get("parkingLotId").toString();
 
-                                db.collection("parkingLot").document(docname).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<DocumentSnapshot> taska) {
-                                        if (taska.isSuccessful()) {
-                                            DocumentSnapshot documentSnapshot = taska.getResult();
-                                            TextView resertt = findViewById(R.id.reservText);
-                                            TextView address = findViewById(R.id.roomAddress);
-                                            TextView name = findViewById(R.id.oneroomname);
-                                            Button remove = findViewById(R.id.remove);
-                                            if (documentSnapshot.exists()) {
-                                                resertt.setVisibility(View.VISIBLE);
-                                                ImageView imageView = findViewById(R.id.oneroomimage);
-                                                Glide.with(getApplicationContext())
-                                                        .load(documentSnapshot.get("imageUrl"))
-                                                        .into(imageView);
-                                                address.setText(documentSnapshot.get("address").toString());
-                                                name.setText(documentSnapshot.get("title").toString());
-
-                                                remove.setVisibility(View.VISIBLE);
-                                            } else {
-                                                System.out.println("No such document");
-                                                remove.setVisibility(View.INVISIBLE);
-                                                resertt.setVisibility(View.INVISIBLE);
-                                            }
-                                        } else
-                                            System.out.println("get failed with " + taska.getException());
-                                    }
-                                });
-                            }
-                        } else {
-                            System.out.println(task.getException());
-                        }
-                    }
-                });
     }
 }

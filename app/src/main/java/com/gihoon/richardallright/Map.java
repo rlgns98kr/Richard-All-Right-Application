@@ -7,6 +7,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -68,6 +69,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
     private long backKeyPressedTime = 0;
     // 첫 번째 뒤로가기 버튼을 누를때 표시
     private Toast toast;
+
     @Override
     public void onBackPressed() {
         if (System.currentTimeMillis() > backKeyPressedTime + 2000) {
@@ -87,15 +89,15 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-
+        System.out.println(currentUser.getEmail());
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map_fragment);
         mapFragment.getMapAsync(this);
 
-        FloatingActionButton button = (FloatingActionButton) findViewById(R.id.menuButton);
+        ImageButton button = (ImageButton) findViewById(R.id.menuButton);
 
         final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        button.setOnClickListener(new Button.OnClickListener() {
+        button.setOnClickListener(new ImageButton.OnClickListener() {
             @Override
             public void onClick(View v) {
                 drawer.openDrawer(Gravity.RIGHT);
@@ -128,6 +130,15 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
                 return true;
             }
         });
+        NavigationView nv = (NavigationView) findViewById(R.id.nav_view);
+        ImageView iv = nv.getHeaderView(0).findViewById(R.id.action_image);
+        TextView tv = nv.getHeaderView(0).findViewById(R.id.action_name);
+        if (currentUser.getPhotoUrl() != null) {
+            Glide.with(getApplication()).load(currentUser.getPhotoUrl()).into(iv);
+        }
+        if (!currentUser.getDisplayName().equals("")) {
+            tv.setText(currentUser.getDisplayName());
+        }
     }
 
     @Override
@@ -146,8 +157,8 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
                 fl2.setVisibility(View.INVISIBLE);
             }
         });
-        FloatingActionButton dkdk = findViewById(R.id.location);
-        dkdk.setOnClickListener(new FloatingActionButton.OnClickListener() {
+        ImageButton dkdk = findViewById(R.id.location);
+        dkdk.setOnClickListener(new ImageButton.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "위치를 업데이트합니다.\n권한이 없을 경우 기본 위치로 설정됩니다.", Toast.LENGTH_SHORT).show();
@@ -158,15 +169,6 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
                 }
             }
         });
-        ImageView iv = findViewById(R.id.action_image);
-        TextView tv = findViewById(R.id.action_name);
-
-        if (currentUser.getPhotoUrl() != null) {
-            Glide.with(this).load(currentUser.getPhotoUrl()).into(iv);
-        }
-        if (!currentUser.getDisplayName().equals("")) {
-            tv.setText(currentUser.getDisplayName());
-        }
     }
 
     @Override
@@ -239,7 +241,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
                 Glide.with(getApplicationContext())
                         .load(markers.get(marker.getId()).get("imageUrl"))
                         .into(realimage);
-            }else {
+            } else {
                 realimage.setImageResource(R.mipmap.ic_launcher);
             }
             if ((Boolean) markers.get(marker.getId()).get("flag")) {
@@ -252,82 +254,111 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
                 public void onClick(View v) {
                 }
             });
+            Date date = new Date();
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(date);
+            final String year = String.valueOf(calendar.get(Calendar.YEAR));
+            String month = String.valueOf(calendar.get(Calendar.MONTH) + 1);
+            String day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
+
+            if (month.length() == 1) month = "0" + month;
+            if (day.length() == 1) day = "0" + day;
+
+            final String finalmonth = month;
+            final String finalday = day;
             realconfirm.setOnClickListener(new ImageButton.OnClickListener() {
+
                 @Override
                 public void onClick(View v) {
-                    final DocumentReference sfDocRef = db.collection("parkingLot").document(markers.get(marker.getId()).get("id").toString());
-
-                    db.runTransaction(new Transaction.Function<Boolean>() {
-                        @Override
-                        public Boolean apply(Transaction transaction) throws FirebaseFirestoreException {
-                            DocumentSnapshot snapshot = transaction.get(sfDocRef);
-                            boolean newPopulation = !snapshot.getBoolean("flag");
-                            if (!newPopulation) {
-                                transaction.update(sfDocRef, "flag", newPopulation);
-                                return newPopulation;
-                            } else {
-                                throw new FirebaseFirestoreException("Population too high",
-                                        FirebaseFirestoreException.Code.ABORTED);
-                            }
-                        }
-                    }).addOnSuccessListener(new OnSuccessListener<Boolean>() {
-                        @Override
-                        public void onSuccess(Boolean result) {
-                            Date date = new Date();
-                            Calendar calendar = new GregorianCalendar();
-                            calendar.setTime(date);
-                            String year = String.valueOf(calendar.get(Calendar.YEAR));
-                            String month = String.valueOf(calendar.get(Calendar.MONTH) + 1);
-                            String day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
-                            if (month.length() == 1) month = "0" + month;
-                            if (day.length() == 1) day = "0" + day;
-
-                            System.out.println("Transaction success: " + result);
-                            HashMap<String, Object> data = new HashMap<>();
-                            data.put("uid", currentUser.getUid());
-                            data.put("parkingLotId", markers.get(marker.getId()).get("id"));
-                            data.put("date", year + month + day);
-
-                            db.collection("reservation")
-                                    .add(data)
-                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                        @Override
-                                        public void onSuccess(DocumentReference documentReference) {
-                                            Toast.makeText(getApplicationContext(), "KakaoPay 앱이 실행됩니다", Toast.LENGTH_LONG).show();
-                                            String url = "https://kapi.kakao.com/v1/payment/ready";
-
-                                            ContentValues params = new ContentValues();
-                                            params.put("cid", "TC0ONETIME");
-                                            params.put("partner_order_id", "1001");
-                                            params.put("partner_user_id", "gihoony");
-                                            params.put("item_name", markers.get(marker.getId()).get("title").toString());
-                                            params.put("quantity", "1");
-                                            params.put("total_amount", markers.get(marker.getId()).get("price").toString());
-                                            params.put("tax_free_amount", 0);
-                                            params.put("approval_url", "https://gihoonrar.page.link/?link=https://richardallright.com/payment&apn=com.gihoon.richardallright");
-                                            params.put("cancel_url", "https://gihoonrar.page.link/cancel");
-                                            params.put("fail_url", "https://gihoonrar.page.link/fail");
-                                            NetworkTask networkTask = new NetworkTask(url, params);
-                                            networkTask.execute();
+                    db.collection("reservation").whereEqualTo("uid", currentUser.getUid())
+                            .whereEqualTo("date", year + finalmonth + finalday)
+                            .get()
+                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    Boolean flag = false;
+                                    if (task.isSuccessful()) {
+                                        for (QueryDocumentSnapshot document : task.getResult()) {
+                                            flag = true;
+                                            HashMap a = (HashMap) document.getData();
+                                            String docname = a.get("parkingLotId").toString();
+                                            System.out.println("bb" + document.getData());
                                         }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            sfDocRef.update("flag", false);
-                                            Intent a = new Intent(getApplicationContext(), Map.class);
-                                            a.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                            startActivity(a);
-                                            finish();
-                                        }
-                                    });
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(getApplicationContext(), "이미 예약된 자리입니다.\n왼쪽 상단의 위치 갱신 버튼을 눌러 위치를 갱신하세요.", Toast.LENGTH_LONG);
-                        }
-                    });
+                                    } else {
+                                        System.out.println(task.getException());
+                                    }
+                                    if (flag == false) {
+                                        final DocumentReference sfDocRef = db.collection("parkingLot").document(markers.get(marker.getId()).get("id").toString());
+
+                                        db.runTransaction(new Transaction.Function<Boolean>() {
+                                            @Override
+                                            public Boolean apply(Transaction transaction) throws FirebaseFirestoreException {
+                                                DocumentSnapshot snapshot = transaction.get(sfDocRef);
+                                                boolean newPopulation = !snapshot.getBoolean("flag");
+                                                if (!newPopulation) {
+                                                    transaction.update(sfDocRef, "flag", newPopulation);
+                                                    return newPopulation;
+                                                } else {
+                                                    throw new FirebaseFirestoreException("Population too high",
+                                                            FirebaseFirestoreException.Code.ABORTED);
+                                                }
+                                            }
+                                        }).addOnSuccessListener(new OnSuccessListener<Boolean>() {
+                                            @Override
+                                            public void onSuccess(Boolean result) {
+
+
+                                                System.out.println("Transaction success: " + result);
+                                                HashMap<String, Object> data = new HashMap<>();
+                                                data.put("uid", currentUser.getUid());
+                                                data.put("parkingLotId", markers.get(marker.getId()).get("id"));
+                                                data.put("date", year + finalmonth + finalday);
+
+                                                db.collection("reservation")
+                                                        .add(data)
+                                                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                                            @Override
+                                                            public void onSuccess(DocumentReference documentReference) {
+                                                                Toast.makeText(getApplicationContext(), "KakaoPay 앱이 실행됩니다", Toast.LENGTH_LONG).show();
+                                                                String url = "https://kapi.kakao.com/v1/payment/ready";
+
+                                                                ContentValues params = new ContentValues();
+                                                                params.put("cid", "TC0ONETIME");
+                                                                params.put("partner_order_id", "1001");
+                                                                params.put("partner_user_id", "gihoony");
+                                                                params.put("item_name", markers.get(marker.getId()).get("title").toString());
+                                                                params.put("quantity", "1");
+                                                                params.put("total_amount", markers.get(marker.getId()).get("price").toString());
+                                                                params.put("tax_free_amount", 0);
+                                                                params.put("approval_url", "https://gihoonrar.page.link/?link=https://richardallright.com/payment&apn=com.gihoon.richardallright");
+                                                                params.put("cancel_url", "https://gihoonrar.page.link/cancel");
+                                                                params.put("fail_url", "https://gihoonrar.page.link/fail");
+                                                                NetworkTask networkTask = new NetworkTask(url, params);
+                                                                networkTask.execute();
+                                                            }
+                                                        })
+                                                        .addOnFailureListener(new OnFailureListener() {
+                                                            @Override
+                                                            public void onFailure(@NonNull Exception e) {
+                                                                sfDocRef.update("flag", false);
+                                                                Intent a = new Intent(getApplicationContext(), Map.class);
+                                                                a.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                                startActivity(a);
+                                                                finish();
+                                                            }
+                                                        });
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Toast.makeText(getApplicationContext(), "이미 예약된 자리입니다.\n왼쪽 상단의 위치 갱신 버튼을 눌러 위치를 갱신하세요.", Toast.LENGTH_LONG);
+                                            }
+                                        });
+                                    } else {
+                                        Toast.makeText(getApplicationContext(), "이미 예약하신 자리가 있습니다. My Page 에서 확인하여 주세요.", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
                 }
             });
         } else {
