@@ -136,7 +136,6 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
         if (currentUser.getPhotoUrl() != null) {
             Glide.with(getApplication()).load(currentUser.getPhotoUrl()).into(iv);
         }
-        System.out.println("aa" + currentUser.getDisplayName());
         if (currentUser.getDisplayName() != null) {
             if (!currentUser.getDisplayName().equals("")) {
                 tv.setText(currentUser.getDisplayName());
