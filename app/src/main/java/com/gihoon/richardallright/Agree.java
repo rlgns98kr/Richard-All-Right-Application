@@ -21,10 +21,6 @@ public class Agree extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_agree);
 
-        ActionBar ab;
-        ab = getSupportActionBar();
-        ab.hide();
-
         TextView tv = findViewById(R.id.textViewagree);
         tv.setText(ReadTextFile());
 

@@ -186,7 +186,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
         }
         mMap.clear();
         mMap.addMarker(new MarkerOptions().position(sydney).title("내 위치"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 15));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 17));
 
         BitmapDrawable bitmapdrawe = (BitmapDrawable) getResources().getDrawable(R.drawable.location_logo_available);
         BitmapDrawable bitmapdrawf = (BitmapDrawable) getResources().getDrawable(R.drawable.location_logo_full);
@@ -364,7 +364,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
         } else {
             //fl1.bringToFront();
         }
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 15));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 17));
         return false;
     }
 
