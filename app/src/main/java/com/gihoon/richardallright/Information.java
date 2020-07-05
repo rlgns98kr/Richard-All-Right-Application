@@ -43,10 +43,11 @@ public class Information extends AppCompatActivity {
         if (currentUser.getPhotoUrl() != null) {
             Glide.with(this).load(currentUser.getPhotoUrl()).into(userview);
         }
-        if (!currentUser.getDisplayName().equals("")) {
-            username.setText(currentUser.getDisplayName());
+        if(currentUser.getDisplayName()!=null) {
+            if (!currentUser.getDisplayName().equals("")) {
+                username.setText(currentUser.getDisplayName());
+            }
         }
-
         Date date = new Date();
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(date);
