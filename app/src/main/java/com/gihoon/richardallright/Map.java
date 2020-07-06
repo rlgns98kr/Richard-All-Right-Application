@@ -353,7 +353,7 @@ public class Map extends AppCompatActivity implements OnMapReadyCallback, Google
                                         }).addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
-                                                Toast.makeText(getApplicationContext(), "이미 예약된 자리입니다.\n왼쪽 상단의 위치 갱신 버튼을 눌러 위치를 갱신하세요.", Toast.LENGTH_LONG);
+                                                Toast.makeText(getApplicationContext(), "이미 예약된 자리입니다.\n왼쪽 상단의 위치 갱신 버튼을 눌러 위치를 갱신하세요.", Toast.LENGTH_LONG).show();
                                             }
                                         });
                                     } else {
